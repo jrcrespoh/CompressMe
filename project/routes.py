@@ -1,8 +1,8 @@
-from flask import json, request, render_template, make_response, send_from_directory
+from flask import json, request, render_template, send_from_directory
 from project import application
 from bs4 import BeautifulSoup
 from bs4.element import Comment
-import urllib.request
+from urllib import request as http_request
 
 
 @application.route("/")
@@ -71,7 +71,7 @@ def indexed(url):
 
 def compress(url):
     try:
-        html = urllib.request.urlopen(url).read()
+        html = http_request.urlopen(url).read()
         content = extract_content(html)
         with open("project/sites/indexed.json", mode='r') as f:
             index = json.load(f)
