@@ -43,7 +43,7 @@
 		    <input type="text" class="form-control" id="url" aria-describedby="basic-addon1"/><br>
 			<button id="compressMe" class="btn btn-primary btn-lg btn-block" href="#">Compress Me!</button>
         </div>
-           
+
       </div>
     </div>
   </header>
@@ -56,6 +56,12 @@
   <script src="static/vendor/jquery/jquery.min.js"></script>
   <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script>
+  function show_download_button() {
+      //stuff
+  }
+  function show_error() {
+      //stuff
+  }
   $("#compressMe").click(function(){
   	$.ajax({
 		type: 'POST',
@@ -63,11 +69,24 @@
 		data: {"url": $("#url").val()}
 	})
 	.done(function(data) {
-		console.log(data);
-		document.getElementById("result").innerHTML = data;
+        if (data.success) {
+            show_download_button(data.file_url)
+        } else {
+            show_error()
+        }
 	});
+    });
+$("#downloadMe").click(function(){
+  $.ajax({
+      type: 'POST',
+      url: 'files',
+      data: {"txturl": $("#url").val()}
+  })
+  .done(function(data) {
+      html
+  });
 });
-  
+
 
   </script>
 
