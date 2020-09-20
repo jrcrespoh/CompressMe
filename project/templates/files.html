@@ -16,7 +16,8 @@
   <!-- Custom fonts for this template -->
   <link href="static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
   <link href="static/vendor/simple-line-icons/css/simple-line-icons.css" rel="stylesheet" type="text/css">
-  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet"
+    type="text/css">
 
   <!-- Custom styles for this template -->
   <link href="static/css/landing-page.min.css" rel="stylesheet">
@@ -40,8 +41,14 @@
       <div class="row">
         <div class="col-xl-9 mx-auto">
           <h1 class="mb-5">Submit URL to get light version</h1>
-		    <input type="text" class="form-control" id="url" aria-describedby="basic-addon1"/><br>
-			<button id="compressMe" class="btn btn-primary btn-lg btn-block" href="#">Compress Me!</button>
+          <input type="text" class="form-control" id="url" aria-describedby="basic-addon1" /><br>
+
+          <button id="compressMe" class="btn btn-primary btn-lg btn-block" href="#">Compress Me!</button>
+
+          <button id="download" class="btn btn-primary btn-lg btn-block" formaction="/fetch" formmethod = "post" type="submit">Download</button>
+        </div>
+        <div id="error" class="alert alert-primary" role="alert">
+          Invalid URL!
         </div>
 
       </div>
@@ -49,44 +56,39 @@
   </header>
 
 
-<p id="result"></p>
+  <p id="result"></p>
 
 
   <!-- Bootstrap core JavaScript -->
   <script src="static/vendor/jquery/jquery.min.js"></script>
   <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script>
-  function show_download_button() {
-      //stuff
-  }
-  function show_error() {
-      //stuff
-  }
-  $("#compressMe").click(function(){
-  	$.ajax({
-		type: 'POST',
-		url: 'files',
-		data: {"url": $("#url").val()}
-	})
-	.done(function(data) {
-        if (data.success) {
-            show_download_button(data.file_url)
-        } else {
-            show_error()
-        }
-	});
-    });
-$("#downloadMe").click(function(){
-  $.ajax({
-      type: 'POST',
-      url: 'files',
-      data: {"txturl": $("#url").val()}
-  })
-  .done(function(data) {
-      html
-  });
-});
+    document.getElementById("download").style.visibility = "hidden";
+    document.getElementById("error").style.visibility = "hidden";
 
+
+    $("#compressMe").click(function () {
+      $.ajax({
+        type: 'POST',
+        url: 'files',
+        data: { "url": $("#url").val() }
+      })
+        .done(function (data) {
+          if (data.success) {
+
+            document.getElementById("download").style.visibility = "visible";
+            document.getElementById("download").setAttribute("value",$("#url").val());
+            
+            
+            
+
+          } else {
+            document.getElementById("error").style.visibility = "visible";
+
+          }
+        });
+    });
+   
 
   </script>
 
