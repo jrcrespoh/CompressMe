@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
     <meta charset="utf-8">
@@ -21,6 +22,7 @@
     <link href="static/css/landing-page.min.css" rel="stylesheet">
 
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="navbar navbar-light bg-light static-top">
@@ -66,7 +68,10 @@
                     $("#latest").html(function() {
                         result = "";
                         for (site of data.sites) {
-                            result += '<li class="list-group-item list-group-item-dark">';
+                            result += '<li class="';
+                            result += 'list-group-item ';
+                            result += 'list-group-item-dark ';
+                            result += 'overflow-auto">';
                             result += site + '</li>';
                         }
                         return result;
@@ -96,4 +101,5 @@
         });
     </script>
 </body>
+
 </html>
