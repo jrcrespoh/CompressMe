@@ -1,11 +1,9 @@
-from flask import jsonify, request, render_template, url_for
-import json
+from flask import json, request, render_template, make_response, send_from_directory
 from project import application
 from bs4 import BeautifulSoup
 from bs4.element import Comment
 import urllib.request
 
-index = ""
 
 @application.route("/")
 def index():
@@ -17,18 +15,34 @@ def activities():
     if request.method == 'POST':
         url = request.form.get("url")
         if indexed(url):
-            file_url = fetch_file(url)
-            return jsonify(success=True, file_url=file_url)
+            return json.jsonify(success=True)
         else:
-            process(url)
-        try:
-            html = urllib.request.urlopen(url).read()
-        except urllib.URLError:
-            return jsonify(sucess=False, file_url=None)
-        return text_from_html(html)
-
+            return compress(url)
     else:
         return render_template("files.html")
+
+
+@application.route("/fetch", methods=['POST'])
+def download():
+    url = request.form.get("url")
+    try:
+        filename = fetch_file(url)
+    except Exception:
+        return
+    return send_from_directory("sites",
+                               filename,
+                               as_attachment=True,
+                               attachment_filename="site.txt")
+
+
+@application.route("/latest", methods=['POST'])
+def get_latest():
+    try:
+        with open("project/sites/indexed.json", mode='r') as f:
+            index = json.load(f)
+        return json.jsonify(success=True, sites=index['latest'])
+    except Exception:
+        return json.jsonify(success=False)
 
 
 def tag_visible(element):
@@ -39,7 +53,7 @@ def tag_visible(element):
     return True
 
 
-def text_from_html(body):
+def extract_content(body):
     soup = BeautifulSoup(body, 'html.parser')
     texts = soup.findAll(text=True)
     visible_texts = filter(tag_visible, texts)
@@ -47,12 +61,39 @@ def text_from_html(body):
 
 
 def indexed(url):
-    pass
+    try:
+        with open("project/sites/indexed.json", mode='r') as f:
+            index = json.load(f)
+        return url in index['sites']
+    except Exception:
+        return False
 
 
-def process(url):
-    pass
+def compress(url):
+    try:
+        html = urllib.request.urlopen(url).read()
+        content = extract_content(html)
+        with open("project/sites/indexed.json", mode='r') as f:
+            index = json.load(f)
+        count = index['count']
+        with open(f"project/sites/{count}.txt", mode='x') as f:
+            f.write(content)
+        index['sites'][url] = count
+        index['latest'].append(url)
+        index['latest'].pop(0)
+        index['count'] += 1
+        with open("project/sites/indexed.json", mode='w') as f:
+            json.htmlsafe_dump(index, f)
+        return json.jsonify(success=True)
+    except Exception:
+        return json.jsonify(success=False)
 
 
 def fetch_file(url):
-    pass
+    try:
+        with open("project/sites/indexed.json", mode='r') as f:
+            index = json.load(f)
+        site = index['sites'][url]
+        return f'{site}.txt'
+    except Exception as e:
+        raise e

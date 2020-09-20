@@ -3,94 +3,100 @@
 
 <head>
 
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="">
-  <meta name="author" content="">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-  <title>CompressMe</title>
+    <title>CompressMe</title>
 
-  <!-- Bootstrap core CSS -->
-  <link href="static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap core CSS -->
+    <link href="static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- Custom fonts for this template -->
-  <link href="static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-  <link href="static/vendor/simple-line-icons/css/simple-line-icons.css" rel="stylesheet" type="text/css">
-  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet"
-    type="text/css">
+    <!-- Custom fonts for this template -->
+    <link href="static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="static/vendor/simple-line-icons/css/simple-line-icons.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
 
-  <!-- Custom styles for this template -->
-  <link href="static/css/landing-page.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="static/css/landing-page.min.css" rel="stylesheet">
 
 </head>
 
 <body>
 
-  <!-- Navigation -->
-  <nav class="navbar navbar-light bg-light static-top">
-    <div class="container">
-      <a class="navbar-brand" href="/">CompressMe</a>
-      <a class="btn btn-primary" href="#">View Files</a>
-    </div>
-  </nav>
-
-  <!-- Masthead -->
-  <header class="masthead text-white text-center">
-    <div class="overlay"></div>
-    <div class="container">
-      <div class="row">
-        <div class="col-xl-9 mx-auto">
-          <h1 class="mb-5">Submit URL to get light version</h1>
-          <input type="text" class="form-control" id="url" aria-describedby="basic-addon1" /><br>
-
-          <button id="compressMe" class="btn btn-primary btn-lg btn-block" href="#">Compress Me!</button>
-
-          <button id="download" class="btn btn-primary btn-lg btn-block" formaction="/fetch" formmethod = "post" type="submit">Download</button>
+    <!-- Navigation -->
+    <nav class="navbar navbar-light bg-light static-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">CompressMe</a>
+            <a class="btn btn-primary" href="#">View Files</a>
         </div>
-        <div id="error" class="alert alert-primary" role="alert">
-          Invalid URL!
+    </nav>
+
+    <!-- Masthead -->
+    <header class="masthead text-white text-center">
+        <div class="overlay"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-9 mx-auto">
+                    <h1 class="mb-5">Submit URL to get light version</h1>
+                    <div id="error" class="alert alert-danger" role="alert">Invalid URL!</div>
+                    <input type="text" class="form-control" id="url" aria-describedby="basic-addon1" /><br>
+                    <button id="compressMe" class="btn btn-primary btn-lg btn-block" href="#">Compress Me!</button>
+                    <form action="/fetch" method="post">
+                        <button id="download" class="btn btn-primary btn-lg btn-block" type="submit" name="url">Download</button>
+                    </form>
+                    <p>Latest websites compressed:</p>
+                    <ul class="list-group" id="latest"></ul>
+                </div>
+            </div>
         </div>
-
-      </div>
-    </div>
-  </header>
+    </header>
 
 
-  <p id="result"></p>
-
-
-  <!-- Bootstrap core JavaScript -->
-  <script src="static/vendor/jquery/jquery.min.js"></script>
-  <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script>
-    document.getElementById("download").style.visibility = "hidden";
-    document.getElementById("error").style.visibility = "hidden";
-
-
-    $("#compressMe").click(function () {
-      $.ajax({
-        type: 'POST',
-        url: 'files',
-        data: { "url": $("#url").val() }
-      })
-        .done(function (data) {
-          if (data.success) {
-
-            document.getElementById("download").style.visibility = "visible";
-            document.getElementById("download").setAttribute("value",$("#url").val());
-            
-            
-            
-
-          } else {
-            document.getElementById("error").style.visibility = "visible";
-
-          }
+    <!-- Bootstrap core JavaScript -->
+    <script src="static/vendor/jquery/jquery.min.js"></script>
+    <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $("#download").hide();
+        $("#error").hide();
+        $.ajax({
+                type: 'POST',
+                url: 'latest'
+            })
+            .done(function(data) {
+                if (data.success) {
+                    $("#latest").html(function() {
+                        result = "";
+                        for (site of data.sites) {
+                            result += '<li class="list-group-item">' + site + '</li>';
+                        }
+                        return result;
+                    })
+                } else {
+                    console.log("Could not load latest websites compressed.");
+                }
+            });
+        $("#compressMe").click(function() {
+            $.ajax({
+                    type: 'POST',
+                    url: 'files',
+                    data: {
+                        "url": $("#url").val()
+                    }
+                })
+                .done(function(data) {
+                    if (data.success) {
+                        $("#error").hide();
+                        $("#download").show();
+                        $("#download").attr("value", $("#url").val());
+                    } else {
+                        $("#error").show();
+                        $("#download").hide();
+                    }
+                });
         });
-    });
-   
-
-  </script>
+    </script>
 
 </body>
 
